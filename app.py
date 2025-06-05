@@ -18,6 +18,10 @@ st.title("Integrantes do Grupo")
 beatriz, felipe, joao = st.columns(3)
 with beatriz.container(border=True):
     st.header("Beatriz", divider=True)
+    st.subheader("SP3161315")
+    linkedin_url_beatriz = "https://www.linkedin.com/in/beatrizmunizz/"
+    github_url_beatriz = "https://github.com/beamuniz"
+    st.markdown(f"[:material/open_in_new: LinkedIn]({linkedin_url_beatriz}) &nbsp;&nbsp; [:material/open_in_new: GitHub]({github_url_beatriz})")
 with felipe.container(border=True):
     st.header("Felipe", divider=True)
 with joao.container(border=True):
