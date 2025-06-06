@@ -24,6 +24,10 @@ with beatriz.container(border=True):
     st.markdown(f"[:material/open_in_new: LinkedIn]({linkedin_url_beatriz}) &nbsp;&nbsp; [:material/open_in_new: GitHub]({github_url_beatriz})")
 with felipe.container(border=True):
     st.header("Felipe", divider=True)
+    st.subheader("SP3155048")
+    linkedin_url_felipe = "https://www.linkedin.com/in/felipe-teixeira-de-lima/"
+    github_url_felipe = "https://github.com/felipeteixeiradelima"
+    st.markdown(f"[:material/open_in_new: LinkedIn]({linkedin_url_felipe}) &nbsp;&nbsp; [:material/open_in_new: GitHub]({github_url_felipe})")
 with joao.container(border=True):
     st.header("João", divider=True)
     st.subheader("SP3137627")
