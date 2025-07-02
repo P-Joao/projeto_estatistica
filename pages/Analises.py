@@ -3,6 +3,41 @@ import pandas as pd
 
 import seaborn as sns
 import matplotlib.pyplot as plt
+import numpy as np
+from scipy import stats
+import folium
+from folium.plugins import HeatMap
+from streamlit_folium import folium_static
+
+
+def create_map_arrest():
+    if 'map' not in st.session_state or st.session_state.map is None:
+        df_coordenadas = df_arrest_data[['LAT', 'LON']]
+        df_coordenadas.dropna()
+        # Selecionando apenas as coordenadas que não são outliers em LAT ou LON
+        df_coordenadas = df_coordenadas[
+            (np.abs(stats.zscore(df_coordenadas['LAT'])) < 3) & 
+            (np.abs(stats.zscore(df_coordenadas['LON'])) < 3)
+        ] 
+        mapa = folium.Map(location=[34.0522, -118.2437], zoom_start=10)
+        coordenadas = df_coordenadas[['LAT', 'LON']]
+        coordenadas = coordenadas.to_dict()
+        latitudes = coordenadas['LAT']
+        longitude = coordenadas['LON']
+        heat_data = list(zip(latitudes.values(), longitude.values()))
+        mapa_calor = HeatMap(heat_data, radius=8, blur=12)
+        mapa.add_child(mapa_calor)
+        st.session_state.map = mapa  # Save the map in the session state
+    return st.session_state.map
+
+def show_map_arrest():
+    m = create_map_arrest()  # Get or create the map
+    folium_static(m)
+
+@st.cache_data
+def read_data_arrest():
+    df_data = pd.read_csv('mock_data\Arrest_Data_from_2020_to_Present.csv')
+    return df_data
 
 st.set_page_config(
     page_title="Análises Realizadas",
@@ -14,7 +49,7 @@ st.title("Análises Realizadas")
 # st.image("imgs/crisp_dm_process.png", caption="Processo de análise de dados CRISP-DM")
 
 st.header("Base de prisões de 2020 para o presente", divider=True)
-df_arrest_data = pd.read_csv('mock_data\Arrest_Data_from_2020_to_Present.csv')
+df_arrest_data = read_data_arrest()
 
 st.header("Metadados da base")
 df_arrest_metadados = pd.read_csv('mock_data/metadados_arrest_data.csv')
@@ -100,3 +135,12 @@ with st.container(border=True):
             else:
                 freq_rel_desc_outros += freq_rel_desc
         st.write(f'Outras: {freq_rel_desc_outros:.2f}%')
+        
+with st.header("Análise de dados de localização", divider=True):
+    
+    with st.container(border=True):
+        st.header('Análise Geográfica de Crimes :material/map:')
+        st.markdown('<h4>Mapa de calor de ocorrência de crimes</h4>', unsafe_allow_html=True)
+        
+    
+        show_map_arrest()
