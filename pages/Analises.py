@@ -135,12 +135,29 @@ with st.container(border=True):
             else:
                 freq_rel_desc_outros += freq_rel_desc
         st.write(f'Outras: {freq_rel_desc_outros:.2f}%')
-        
-with st.header("Análise de dados de localização", divider=True):
+
+# -------------------------------------------------------------------- #
+# -------------------------------------------------------------------- #
+# -------------------------------------------------------------------- #
+
+st.header("Análise de dados relacionados as prisões", divider=True)
+
+with st.container(border=True):
+    st.header('Horário de Ocorrência das Prisões :material/alarm:')
+    fig, ax = plt.subplots()
+    # Use o Seaborn para desenhar o boxplot NO EIXO (ax) que criamos.
+    sns.barplot(x=df_arrest_data['Time'], ax=ax)
+    # Configure os títulos e rótulos USANDO o objeto 'ax'.
+    ax.set_title('Distribuição do horário de ocorrência das prisões')
+    ax.set_ylabel('Número de Ocorrências')
+    ax.set_xlabel('Faixa de Horário')
+    ax.grid(axis='y', linestyle='--', alpha=0.7) # Adiciona uma grade para melhor leitura
+    # Use st.pyplot() para renderizar a FIGURA no Streamlit.
+    st.pyplot(fig)
+
+st.header("Análise de dados de localização", divider=True)
     
-    with st.container(border=True):
-        st.header('Análise Geográfica de Crimes :material/map:')
-        st.markdown('<h4>Mapa de calor de ocorrência de crimes</h4>', unsafe_allow_html=True)
-        
-    
-        show_map_arrest()
+with st.container(border=True):
+    st.header('Análise Geográfica de Crimes :material/map:')
+    st.markdown('<h4>Mapa de calor de ocorrência de crimes</h4>', unsafe_allow_html=True)
+    show_map_arrest()
