@@ -1,0 +1,19 @@
+Column Name,Description,API Field Name,Data Type
+Report ID,ID for the arrest.,rpt_id,Text
+Report Type,BOOKING = Person is booked at a detention facility RFC = Person is cited and Released From Custody (RFC),report_type,Text
+Arrest Date,MM/DD/YYYY,arst_date,Floating Timestamp
+Time,In 24 hour military time.,time,Text
+Area ID,The LAPD has 21 Community Police Stations referred to as Geographic Areas within the department. These Geographic Areas are sequentially numbered from 1-21.,area,Text
+Area Name,"The 21 Geographic Areas or Patrol Divisions are also given a name designation that references a landmark or the surrounding community that it is responsible for. For example 77th Street Division is located at the intersection of South Broadway and 77th Street, serving neighborhoods in South Los Angeles.
+Read more",area_desc,Text
+Reporting District,"A four-digit code that represents a sub-area within a Geographic Area. All arrest records reference the ""RD"" that it occurred in for statistical comparisons. Find LAPD Reporting Districts on the LA City GeoHub at http://geohub.lacity.org/datasets/lapd-reporting-districts?geometry=-121.023%2C33.621%2C-115.797%2C34.418
+Read more",rd,Text
+Age,Two character numeric..,age,Text
+Sex Code,F - Female M - Male,sex_cd,Text
+Descent Code,"Descent Code: A - Other Asian B - Black C - Chinese D - Cambodian F - Filipino G - Guamanian H - Hispanic/Latin/Mexican I - American Indian/Alaskan Native J - Japanese K - Korean L - Laotian O - Other P - Pacific Islander S - Samoan U - Hawaiian V - Vietnamese W - White X - Unknown Z - Asian Indian
+Read more",descent_cd,Text
+Charge Group Code,Category of arrest charge.,chrg_grp_cd,Text
+Charge Group Description,Defines the Charge Group Code provided.,grp_description,Text
+Arrest Type Code,A code to indicate the type of charge the individual was arrested for. D - Dependent F - Felony I - Infraction M - Misdemeanor O - Other,arst_typ_cd,Text
+Charge,The charge the individual was arrested for.,charge,Text
+Charge Description,Defines the Charge provided.,chrg_desc,Text
