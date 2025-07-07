@@ -8,15 +8,11 @@ st.set_page_config(
 st.title("Estatística e Probabilidade")
 st.write("Projeto de estatística voltado para análise exploratória de bases de dados relacionadas a ocorrências de crimes na cidade de Los Angeles, CA a partir do ano de 2020.")
 
-bases, analises, relatorio = st.columns(3)
+bases, relatorio = st.columns(2)
 with bases.container(border=True):
     if st.button(label=":material/database: Docs e Bases"):
         st.switch_page("pages/Docs_e_Bases.py")
     st.write("Bases, bibliotecas e tecnologias utilizadas no projeto.")
-with analises.container(border=True):
-    if st.button(label=":material/edit_note: Análises Realizadas"):
-        st.switch_page("pages/Analises.py")
-    st.write("Análises exploratórias realizadas, questionamentos e cálculos estatísticos.")
 with relatorio.container(border=True):
     if st.button(label=":material/newspaper: Relatório Final"):
         st.switch_page("pages/Relatorio_Final.py")
