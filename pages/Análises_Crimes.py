@@ -1,8 +1,6 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.express as px
-from scipy.stats import chi2_contingency
 
 
 st.set_page_config(page_title="Análise de Crimes em LA")
