@@ -1,0 +1,8 @@
+Column Name,Description,API Field Name,Data Type
+Incident_Number,,Incident_Number,Text
+Area_Occ,,Area_Occ,Text
+Rpt_Dist,,Rpt_Dist,Text
+Dispatch_Date,,Dispatch_Date,Text
+Dispatch_Time,,Dispatch_Time,Text
+Call_Type_Code,,Call_Type_Code,Text
+Call_Type_Text,,Call_Type_Text,Text
