@@ -8,6 +8,7 @@ from scipy import stats
 import folium
 from folium.plugins import HeatMap
 from streamlit_folium import folium_static
+from scipy.stats import ttest_ind  
 
 
 def create_map_arrest():
@@ -38,6 +39,46 @@ def show_map_arrest():
 def read_data_arrest():
     df_data = pd.read_csv('mock_data/Arrest_Data_from_2020_to_Present.csv')
     return df_data
+
+def test_t_hora_sexo(df):
+    """
+    Realiza um teste t para verificar se há diferença significativa
+    no horário médio de prisão entre homens e mulheres.
+    """
+    # Removendo linhas onde 'Time' ou 'Sex Code' são nulos
+    df_clean = df.dropna(subset=['Time', 'Sex Code'])
+
+    # Filtrando DataFrame para incluir apenas 'M' (Masculino) e 'F' (Feminino)
+    df_filtered = df_clean[df_clean['Sex Code'].isin(['M', 'F'])]
+
+    # Separando os dados em duas amostras
+    # Amostra 1: Horários de prisão para homens
+    horarios_homens = df_filtered[df_filtered['Sex Code'] == 'M']['Time']
+
+    # Amostra 2: Horários de prisão para mulheres
+    horarios_mulheres = df_filtered[df_filtered['Sex Code'] == 'F']['Time']
+
+    st.write(f"Analisando {len(horarios_homens)} prisões de homens e {len(horarios_mulheres)} prisões de mulheres.")
+    st.write("-" * 50)
+
+    # Realizando o Teste T para Amostras Independentes
+    # A função ttest_ind calcula o teste t
+    stat, p_value = ttest_ind(horarios_homens, horarios_mulheres, equal_var=False) # Usamos equal_var=False pois os tamanhos das amostras são muito diferentes
+
+    # Apresentando e Interpretando os Resultados
+    st.write(f"Estatística do Teste (t-statistic): {stat:.4f}")
+    st.write(f"Valor-p (p-value): {p_value:.4f}")
+    st.write("-" * 50)
+
+    # Definimos nosso nível de significância (alfa)
+    alfa = 0.05
+
+    if p_value < alfa:
+        st.write(f"Conclusão: Como o valor-p ({p_value:.4f}) é menor que {alfa}, rejeitamos a hipótese nula.")
+        st.write("Há uma diferença estatisticamente significativa no horário médio de prisão entre homens e mulheres.")
+    else:
+        st.write(f"Conclusão: Como o valor-p ({p_value:.4f}) é maior ou igual a {alfa}, não podemos rejeitar a hipótese nula.")
+        st.write("Não há evidências de uma diferença estatisticamente significativa no horário médio de prisão entre homens e mulheres.")
 
 st.set_page_config(
     page_title="Análises Realizadas",
@@ -156,16 +197,90 @@ st.header("Análise de dados relacionados as prisões", divider=True)
 
 with st.container(border=True):
     st.header('Horário de Ocorrência das Prisões :material/alarm:')
-    fig, ax = plt.subplots()
-    # Use o Seaborn para desenhar o boxplot NO EIXO (ax) que criamos.
-    sns.barplot(x=df_arrest_data['Time'], ax=ax)
-    # Configure os títulos e rótulos USANDO o objeto 'ax'.
-    ax.set_title('Distribuição do horário de ocorrência das prisões')
-    ax.set_ylabel('Número de Ocorrências')
-    ax.set_xlabel('Faixa de Horário')
-    ax.grid(axis='y', linestyle='--', alpha=0.7) # Adiciona uma grade para melhor leitura
-    # Use st.pyplot() para renderizar a FIGURA no Streamlit.
+
+    df_crimes_horario = df_arrest_data.groupby(['Time']).size().reset_index(name='Contagem')
+    df_crimes_horario['Time'] = df_crimes_horario['Time'].astype(int)
+    df_crimes_horario['Hora'] = (df_crimes_horario['Time'] - 1) // 100
+    df_crimes_horario_hora = df_crimes_horario[['Hora','Contagem']].groupby(['Hora']).sum().reset_index()
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.barplot(
+        data=df_crimes_horario_hora,
+        x='Hora',
+        y='Contagem',
+        ax=ax,
+        palette='viridis'
+    )
+    ax.set_title('Contagem de Prisões por Hora do Dia')
+    ax.set_xlabel('Hora do Dia (00h - 23h)')
+    ax.set_ylabel('Número de Prisões')
     st.pyplot(fig)
+
+    st.markdown('''
+        <div style="text-align: justify;">
+            <p>
+                Após a análise da base do gráfico prisões por hora, fica visível que a maior quantidade de prisões fica das 14h às 22h e também é possível visualizar que após o começo da madrugada (23h - 00h) a quantidade de prisões começa a decair gradativamente até as 5h onde é localizado o menor ponto de contagem de prisões da base.
+            </p>
+            <p>
+                A partir da informação visualizada no gráfico também foi levantada a hipótese de que a média de horário de prisão dos homens poderia ser diferente da média do horário de prisão das mulheres. Dessa forma o teste foi definido da seguinte forma:
+            </p>
+            <p>Hipótese Nula: Média de horário das prisões dos homens é <b>igual</b> a média de horário das prisões das mulheres.</p>
+            <p>Hipótese Nula: Média de horário das prisões dos homens é <b>diferente</b> a média de horário das prisões das mulheres.</p>
+            <p>Afim de realizar a verificação da hipótese, foi utilizado um teste t com nível de confiança alfa de 0.05, realizado da seguinte forma:</p>
+        </div>
+    ''', unsafe_allow_html=True)
+    st.code('''
+        from scipy.stats import ttest_ind
+            
+        """
+        Realiza um teste t para verificar se há diferença significativa
+        no horário médio de prisão entre homens e mulheres.
+        """
+        # Removendo linhas onde 'Time' ou 'Sex Code' são nulos
+        df_clean = df_arrest_data.dropna(subset=['Time', 'Sex Code'])
+
+        # Filtrando DataFrame para incluir apenas 'M' (Masculino) e 'F' (Feminino)
+        df_filtered = df_clean[df_clean['Sex Code'].isin(['M', 'F'])]
+
+        # Separando os dados em duas amostras
+        # Amostra 1: Horários de prisão para homens
+        horarios_homens = df_filtered[df_filtered['Sex Code'] == 'M']['Time']
+
+        # Amostra 2: Horários de prisão para mulheres
+        horarios_mulheres = df_filtered[df_filtered['Sex Code'] == 'F']['Time']
+
+        print(f"Analisando {len(horarios_homens)} prisões de homens e {len(horarios_mulheres)} prisões de mulheres.")
+        print("-" * 50)
+
+        # Realizando o Teste T para Amostras Independentes
+        # A função ttest_ind calcula o teste t
+        stat, p_value = ttest_ind(horarios_homens, horarios_mulheres, equal_var=False) # Usamos equal_var=False pois os tamanhos das amostras são muito diferentes
+
+        # Apresentando e Interpretando os Resultados
+        print(f"Estatística do Teste (t-statistic): {stat:.4f}")
+        print(f"Valor-p (p-value): {p_value:.4f}")
+        print("-" * 50)
+
+        # Definimos nosso nível de significância (alfa)
+        alfa = 0.05
+
+        if p_value < alfa:
+            print(f"Conclusão: Como o valor-p ({p_value:.4f}) é menor que {alfa}, rejeitamos a hipótese nula.")
+            print("Há uma diferença estatisticamente significativa no horário médio de prisão entre homens e mulheres.")
+        else:
+            print(f"Conclusão: Como o valor-p ({p_value:.4f}) é maior ou igual a {alfa}, não podemos rejeitar a hipótese nula.")
+            print("Não há evidências de uma diferença estatisticamente significativa no horário médio de prisão entre homens e mulheres.")
+    ''', language='python')
+    st.markdown('''
+        <div style="text-align: justify;">
+            <p>
+                Assim após a execução do código acima obtivemos o seguinte resultado:
+            </p>
+        </div>
+    ''', unsafe_allow_html=True)
+
+    test_t_hora_sexo(df_arrest_data)
+
 
 st.header("Análise de dados de localização", divider=True)
     
