@@ -36,7 +36,7 @@ def show_map_arrest():
 
 @st.cache_data
 def read_data_arrest():
-    df_data = pd.read_csv('mock_data\Arrest_Data_from_2020_to_Present.csv')
+    df_data = pd.read_csv('mock_data/Arrest_Data_from_2020_to_Present.csv')
     return df_data
 
 st.set_page_config(
@@ -67,7 +67,11 @@ st.write(f"Quantidade de registros: ", len(df_arrest_data))
 st.header("Características dos suspeitos presos", divider=True)
 df_suspeitos = df_arrest_data[['Age', 'Sex Code', 'Descent Code']]
 
-st.write('Realizar testes de hipotese para verificar se diferença de proporção entre descendencias')
+st.markdown("""
+    <div style="text-align:justify;">
+        Afim de entender melhor caracteristicas relacionadas aos suspeitos presos registrados na base de dados, abaixo foram realizadas análises quanto as variáveis: idade, sexo e descendência.
+    </div>
+""", unsafe_allow_html=True)
 
 st.write(df_suspeitos)
 
@@ -103,10 +107,12 @@ with st.container(border=True):
     # Use st.pyplot() para renderizar a FIGURA no Streamlit.
     st.pyplot(fig)
 
-    st.write('''
-        Análise dos outliers de idade (Registros com z-score de idade > 3). 
-    ''')
-    df_menores_10 = df_arrest_data[['Age', 'Charge Group Description']].loc[df_arrest_data['Age'] < 9].drop_duplicates()
+    st.markdown('''
+        <div style="text-align:justify;">
+            A partir da análise dos gráficos de distribuição e boxplot de idade, foi possível verificar que a maior quantidade de suspeitos presos fica entre os 20 e 45 anos. Dessa forma, foi dispertada a curiosidade de verificar os outliers, abaixo do limite inferior, para isso foi filtrado do dataframe original os suspeitos presos com idade menor que 10 anos, agrupados por idade e descrição do crime cometido, gerando o dataframe abaixo:
+        </div>
+    ''', unsafe_allow_html=True)
+    df_menores_10 = df_arrest_data.loc[df_arrest_data['Age'] <= 9].groupby(['Age', 'Charge Group Description']).size().reset_index(name='Contagem')
     df_menores_10
 
 with st.container(border=True):
@@ -135,6 +141,12 @@ with st.container(border=True):
             else:
                 freq_rel_desc_outros += freq_rel_desc
         st.write(f'Outras: {freq_rel_desc_outros:.2f}%')
+
+st.markdown('''
+        <div style="text-align:justify;">
+            Após verificar as porcentagem de sexo e descendência ou "blood" como é chamado nos Estados Unidos, por considerarem a etnia de uma forma diferente de como consideramos, podemos verificar que cerca de 80% dos suspeitos presos são homens, enquanto apenas 20% mulheres. Além disso, mais da metade dos suspeitos presos registrados na base (~52%) são "H" (hispânicos, latinos e mexicanos), ~27% "B" (negros) e ~16% "W" (brancos) de acordo com os metadados da base. A partir dessa análise foi buscado uma base com dados demográficos de Los Angeles, a fim de verificar se a porcentagem de cada uma das etnias dos suspeitos presos seria proporcional ou não a população, mas devido a não ter sido encontrada uma base confiável com esses dados, não foi possível realizar esse teste. 
+        </div>
+    ''', unsafe_allow_html=True)
 
 # -------------------------------------------------------------------- #
 # -------------------------------------------------------------------- #
